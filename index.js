@@ -165,6 +165,28 @@ app.delete("/hotels/:hotelId", async (req, res) => {
   }
 });
 
+async function updateHotal(hotalId, dataToUpdate) {
+  try {
+    const updatedHotal = await Hotals.findByIdAndUpdate(hotalId, dataToUpdate, {
+      new: true,
+    });
+    return updatedHotal;
+  } catch (error) {
+    throw error;
+  }
+}
+
+app.post("/hotels/:hotelId", async (req, res) => {
+  try {
+    const updatedHotal = await updateHotal(req.params.hotelId, req.body);
+    res
+      .status(200)
+      .json({ message: "data updated successfully", hotal: updatedHotal });
+  } catch (error) {
+    res.status(500).json({ error: "failed to update data" });
+  }
+});
+
 const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`server is on port ${PORT}`);
