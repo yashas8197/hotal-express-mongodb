@@ -17,9 +17,9 @@ async function readAllHotals() {
   }
 }
 
-app.get("/hotals", (req, res) => {
+app.get("/hotals", async (req, res) => {
   try {
-    const hotals = readAllHotals();
+    const hotals = await readAllHotals();
     if (hotals.length !== 0) {
       res.json(hotals);
     } else {
@@ -98,29 +98,50 @@ app.get("/hotels/rating/:hotelRating", async (req, res) => {
   }
 });
 
-async function readHotelByCategory(hotelCategory){
-  try{
-    const hotelByCategory = await Hotals.findOne({category: hotelCategory})
-    return hotelByCategory
-  }catch(error){
-    throw error
+async function readHotelByCategory(hotelCategory) {
+  try {
+    const hotelByCategory = await Hotals.findOne({ category: hotelCategory });
+    return hotelByCategory;
+  } catch (error) {
+    throw error;
   }
 }
 
-app.get("/hotels/category/:hotelCategory", async (req,res) => {
-  try{
-    const hotel = await readHotelByCategory(req.params.hotelCategory)
-    if(hotel){
-      res.json(hotel)
-    }else{
-      res.status(404).json({error: "hotal not found"})
+app.get("/hotels/category/:hotelCategory", async (req, res) => {
+  try {
+    const hotel = await readHotelByCategory(req.params.hotelCategory);
+    if (hotel) {
+      res.json(hotel);
+    } else {
+      res.status(404).json({ error: "hotal not found" });
     }
-  }catch(error){
-    res.status(500).json({error: "failed to fetch"})
+  } catch (error) {
+    res.status(500).json({ error: "failed to fetch" });
   }
-})
+});
 
+async function createHotal(newHotal) {
+  try {
+    const hotal = new Hotals(newHotal);
+    const saveHotal = await hotal.save();
+    console.log(saveHotal);
+    return saveHotal;
+  } catch (error) {
+    throw error;
+  }
+}
 
+app.post("/hotels", async (req, res) => {
+  try {
+    const saveHotal = await createHotal(req.body);
+    res
+      .status(201)
+      .json({ message: "Hotel added successfully", hotel: saveHotal });
+  } catch (error) {
+    console.error("Error adding hotel:", error); // Log the error for debugging
+    res.status(500).json({ error: "Failed to add Hotel" });
+  }
+});
 
 const PORT = 3000;
 app.listen(PORT, () => {
