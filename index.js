@@ -143,6 +143,28 @@ app.post("/hotels", async (req, res) => {
   }
 });
 
+async function deleteHotel(hotelId) {
+  try {
+    const deletedHotel = await Hotals.findByIdAndDelete(hotelId);
+    return deletedHotel;
+  } catch (error) {
+    throw error;
+  }
+}
+
+app.delete("/hotels/:hotelId", async (req, res) => {
+  try {
+    const deletedHotal = await deleteHotel(req.params.hotelId);
+    if (deletedHotal) {
+      res.status(200).json({ message: "Hotal deleted successfully" });
+    } else {
+      res.status(404).json({ error: "Hotal not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: "filed to fetch data" });
+  }
+});
+
 const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`server is on port ${PORT}`);
